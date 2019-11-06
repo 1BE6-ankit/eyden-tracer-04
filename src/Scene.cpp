@@ -19,6 +19,7 @@ void CScene::ParseOBJ(const std::string& fileName)
 
 		std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelight>(RGB(1, 0.5f, 0));
 		std::vector<Vec3f> vVertexes;
+		std::vector<Vec3f> nVertexes;
 		
 		std::string line;
 
@@ -30,13 +31,35 @@ void CScene::ParseOBJ(const std::string& fileName)
 				Vec3f v;
 				for (int i = 0; i < 3; i++) ss >> v.val[i];
 				// std::cout << "Vertex: " << v << std::endl;
-				vVertexes.emplace_back(100 * v);
+				vVertexes.emplace_back(v);
 			}
 			else if (line == "f") {
-				Vec3i f;
-				for (int i = 0; i < 3; i++) ss >> f.val[i];
-				// std::cout << "Face: " << f << std::endl;
-				Add(std::make_shared<CPrimTriangle>(vVertexes[f.val[0] - 1], vVertexes[f.val[1] - 1], vVertexes[f.val[2] - 1], pShader));
+				// indices to reference (v1,vt1,vn1), (v2, vt2, vn2) and (v3, vt3, vn3)
+				int indices[3][3];
+
+				std::stringstream v_vt_vn;
+				std::string lookup;
+
+				for(int i=0; i<3; i++) {
+					// extract vertex[i], texture[i], and normal[i]
+					ss >> lookup;
+					v_vt_vn = std::stringstream(lookup);
+					for(int j=0; j<3; j++) {
+						getline(v_vt_vn, lookup, '/');
+						indices[i][j] = stoi(lookup) - 1;
+					}
+				}
+
+				Add(std::make_shared<CPrimTriangleSmooth>(
+					vVertexes[indices[0][0]], vVertexes[indices[1][0]], vVertexes[indices[2][0]],
+					nVertexes[indices[0][2]], nVertexes[indices[1][2]], nVertexes[indices[2][2]],
+					pShader));
+			}
+			else if(line == "vn") {
+				// vertex normals
+				Vec3f v;
+				for(int i=0; i < 3; i++) ss >> v.val[i];
+				nVertexes.emplace_back(v);
 			}
 			else {
 				std::cout << "Unknown key [" << line << "] met in the OBJ file" << std::endl;

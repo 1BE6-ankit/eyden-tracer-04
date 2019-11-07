@@ -19,6 +19,8 @@
 #include "LightArea.h"
 #include "timer.h"
 
+#define ENABLE_SUPERSAMPLING
+
 Mat RenderFrame(void)
 {
 	// Define a scene
@@ -71,7 +73,7 @@ Mat RenderFrame(void)
 	for (int y = 0; y < img.rows; y++) {
 		for (int x = 0; x < img.cols; x++) {
 			// --- PUT YOUR CODE HERE ---
-			sampleGenerator.getSamples(nSamples, &u, &v, &weight);
+			sampleGenerator.get()->getSamples(nSamples, u, v, weight);
 			for(int i=0; i<16; i++) {
 				scene.m_pCamera->InitRay(x+u[i], y+v[i], ray); // initialize ray
 				img.at<Vec3f>(y+v[i], x+u[i]) = scene.RayTrace(ray);

@@ -21,7 +21,7 @@ void CScene::ParseOBJ(const std::string& fileName)
 		// std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelight>(RGB(1, 0.5f, 0));
 
 		// Eyelight Texture Shader
-		std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelightTextured>(RGB(1, 0.5f, 0), "../data/barney.bmp");
+		std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelightTextured>(RGB(0.5f, 0.5f, 0.5f), "../data/cb.bmp");
 		
 		std::vector<Vec3f> vVertexes;
 		std::vector<Vec3f> nVertexes;
@@ -33,7 +33,6 @@ void CScene::ParseOBJ(const std::string& fileName)
 			if (!getline(file, line)) break;
 			std::stringstream ss(line);
 			getline(ss, line, ' ');
-			std::cout << line << std::endl;
 			if (line == "v") {
 				Vec3f v;
 				for (int i = 0; i < 3; i++) ss >> v.val[i];

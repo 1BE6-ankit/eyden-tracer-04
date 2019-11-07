@@ -56,25 +56,22 @@ public:
 		// --- PUT YOUR CODE HERE ---
 
 		/**
-		//  *               B
-		//  * A     P  (u)
-		//  *     (v)       C
+		//  *     (gamma)         B
+		//  * A     P  (alpha)
+		//  *     (beta)          C
 		//  * */ 
 		// (u) is on A's oppsite side, (v) is on B's opposite side
 
 		// compute the intersection point P to calculate barcycentric coordinates
 		Vec3f P = ray.org + f * ray.dir;
 
-		Vec3f AC = m_c - m_a;
-		Vec3f BC = m_c - m_b;
 		Vec3f AP = P - m_a;
-		Vec3f BP = P - m_b;
 
 		// compute triangle area
 		float area = (float) norm(edge1.cross(edge2)) / 2.0f;
 
-		ray.u = (float) norm(BP.cross(BC)) / (2.0f * area);
-		ray.v = (float) norm(AP.cross(AC)) / (2.0f * area);
+		ray.u = (float) norm(AP.cross(edge1)) / (2.0f * area);
+		ray.v = (float) norm(AP.cross(edge2)) / (2.0f * area);
 
 		ray.t = f;
 		ray.hit = this;

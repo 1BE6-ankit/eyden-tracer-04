@@ -17,9 +17,15 @@ void CScene::ParseOBJ(const std::string& fileName)
 	if (file.is_open()) {
 		std::cout << "Parsing OBJFile : " << fileName << std::endl;
 
-		std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelight>(RGB(1, 0.5f, 0));
+		// Eyelight Shader
+		// std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelight>(RGB(1, 0.5f, 0));
+
+		// Eyelight Texture Shader
+		std::shared_ptr<IShader> pShader = std::make_shared<CShaderEyelightTextured>(RGB(1, 0.5f, 0), "../data/barney.bmp");
+		
 		std::vector<Vec3f> vVertexes;
 		std::vector<Vec3f> nVertexes;
+		std::vector<Vec2f> tVertexes;
 		
 		std::string line;
 
@@ -27,6 +33,7 @@ void CScene::ParseOBJ(const std::string& fileName)
 			if (!getline(file, line)) break;
 			std::stringstream ss(line);
 			getline(ss, line, ' ');
+			std::cout << line << std::endl;
 			if (line == "v") {
 				Vec3f v;
 				for (int i = 0; i < 3; i++) ss >> v.val[i];
@@ -50,16 +57,34 @@ void CScene::ParseOBJ(const std::string& fileName)
 					}
 				}
 
-				Add(std::make_shared<CPrimTriangleSmooth>(
+				// triangles with vertex normals and texture coordinates
+				Add(std::make_shared<CPrimTriangleSmoothTextured>(
 					vVertexes[indices[0][0]], vVertexes[indices[1][0]], vVertexes[indices[2][0]],
 					nVertexes[indices[0][2]], nVertexes[indices[1][2]], nVertexes[indices[2][2]],
+					tVertexes[indices[0][1]], tVertexes[indices[1][1]], tVertexes[indices[2][1]],
 					pShader));
+
+				// triangles with vertex normals
+				// Add(std::make_shared<CPrimTriangleSmooth>(
+				// 	vVertexes[indices[0][0]], vVertexes[indices[1][0]], vVertexes[indices[2][0]],
+				// 	nVertexes[indices[0][2]], nVertexes[indices[1][2]], nVertexes[indices[2][2]],
+				// 	pShader));
+
+				// triangles with no vertex normals
+				// Add(std::make_shared<CPrimTriangle>(
+				// 	vVertexes[indices[0][0]], vVertexes[indices[1][0]], vVertexes[indices[2][0]],
+				// 	pShader));
 			}
 			else if(line == "vn") {
 				// vertex normals
 				Vec3f v;
 				for(int i=0; i < 3; i++) ss >> v.val[i];
 				nVertexes.emplace_back(v);
+			} else if(line == "vt") {
+				// texture coordinates
+				Vec2f v;
+				for(int i=0; i<2; i++) ss >> v.val[i];
+				tVertexes.emplace_back(v);
 			}
 			else {
 				std::cout << "Unknown key [" << line << "] met in the OBJ file" << std::endl;
